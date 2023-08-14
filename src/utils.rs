@@ -1,7 +1,15 @@
 use ark_std::rand::{prelude::StdRng, SeedableRng};
-use oxrdf::{Graph, NamedNodeRef};
-use oxttl::NTriplesParser;
+use oxrdf::{BlankNode, Graph, NamedNode, NamedNodeRef, NamedOrBlankNode, Term};
+use oxttl::{NTriplesParser, ParseError};
+use rdf_proofs::{proof::VcWithDisclosed, vc::VerifiableCredential};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use wasm_bindgen::JsValue;
+use web_sys::console;
+
+pub fn log(s: String) {
+    console::log_1(&JsValue::from(s))
+}
 
 pub fn object_value_for_predicate(
     graph: &Graph,
@@ -17,13 +25,52 @@ pub fn object_value_for_predicate(
     }
 }
 
-pub fn get_graph_from_ntriples_str(ntriples: &str) -> Graph {
-    Graph::from_iter(
-        NTriplesParser::new()
-            .parse_from_read(ntriples.as_bytes())
-            .into_iter()
-            .map(|x| x.unwrap()),
-    )
+pub fn get_graph_from_ntriples_str(ntriples: &str) -> Result<Graph, ParseError> {
+    let iter = NTriplesParser::new()
+        .parse_from_read(ntriples.as_bytes())
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Graph::from_iter(iter))
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DeriveProofRequest {
+    pub vc_with_disclosed: Vec<(String, String, String, String)>,
+    pub deanon_map: HashMap<String, String>,
+    pub nonce: String,
+    pub document_loader: String,
+}
+
+impl DeriveProofRequest {
+    pub fn get_vc_with_disclosed(&self) -> Vec<VcWithDisclosed> {
+        self.vc_with_disclosed
+            .iter()
+            .map(|(doc, proof, disclosed_doc, disclosed_proof)| {
+                VcWithDisclosed::new(
+                    VerifiableCredential::new(
+                        get_graph_from_ntriples_str(doc).unwrap(),
+                        get_graph_from_ntriples_str(proof).unwrap(),
+                    ),
+                    VerifiableCredential::new(
+                        get_graph_from_ntriples_str(disclosed_doc).unwrap(),
+                        get_graph_from_ntriples_str(disclosed_proof).unwrap(),
+                    ),
+                )
+            })
+            .collect()
+    }
+
+    pub fn get_deanon_map(&self) -> HashMap<NamedOrBlankNode, Term> {
+        self.deanon_map
+            .iter()
+            .map(|(k, v)| {
+                (
+                    BlankNode::new_unchecked(k).into(),
+                    NamedNode::new_unchecked(v).into(),
+                )
+            })
+            .collect()
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
