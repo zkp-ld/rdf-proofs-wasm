@@ -1,36 +1,52 @@
+use crate::error::RDFProofsWasmError;
 use ark_std::rand::{prelude::StdRng, SeedableRng};
-use oxrdf::{BlankNode, Graph, NamedNode, NamedNodeRef, NamedOrBlankNode, Term};
-use oxttl::{NTriplesParser, ParseError};
+use oxrdf::{BlankNode, Dataset, Graph, NamedNode, NamedNodeRef, NamedOrBlankNode, Term};
+use oxttl::{NQuadsParser, NTriplesParser};
 use rdf_proofs::{proof::VcWithDisclosed, vc::VerifiableCredential};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use wasm_bindgen::JsValue;
-use web_sys::console;
 
-pub fn log(s: String) {
-    console::log_1(&JsValue::from(s))
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
 }
+pub(crate) use log;
 
-pub fn object_value_for_predicate(
+pub fn get_object_value_for_predicate(
     graph: &Graph,
     predicate: NamedNodeRef,
-) -> Result<String, &'static str> {
+) -> Result<String, RDFProofsWasmError> {
     let triple = graph
         .triples_for_predicate(predicate)
         .next()
-        .ok_or("triple not exist")?;
+        .ok_or(RDFProofsWasmError::TripleNotExist)?;
     match triple.object {
         oxrdf::TermRef::Literal(v) => Ok(v.value().to_string()),
-        _ => Err("object must be literal"),
+        _ => Err(RDFProofsWasmError::NonLiteralObject),
     }
 }
 
-pub fn get_graph_from_ntriples_str(ntriples: &str) -> Result<Graph, ParseError> {
+pub fn get_graph_from_ntriples_str(ntriples: &str) -> Result<Graph, RDFProofsWasmError> {
     let iter = NTriplesParser::new()
         .parse_from_read(ntriples.as_bytes())
         .into_iter()
         .collect::<Result<Vec<_>, _>>()?;
     Ok(Graph::from_iter(iter))
+}
+
+pub fn get_dataset_from_nquads_str(nquads: &str) -> Result<Dataset, RDFProofsWasmError> {
+    let iter = NQuadsParser::new()
+        .parse_from_read(nquads.as_bytes())
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Dataset::from_iter(iter))
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct KeyPair {
+    pub secret_key: String,
+    pub public_key: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -73,6 +89,14 @@ impl DeriveProofRequest {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct VerifyProofRequest {
+    pub vc_with_disclosed: Vec<(String, String, String, String)>,
+    pub deanon_map: HashMap<String, String>,
+    pub nonce: String,
+    pub document_loader: String,
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // copied from [docknetwork/crypto-wasm](https://github.com/docknetwork/crypto-wasm)
 ////////////////////////////////////////////////////////////////////////////////////
@@ -81,13 +105,6 @@ impl DeriveProofRequest {
 pub struct VerifyResponse {
     pub verified: bool,
     pub error: Option<String>,
-}
-
-impl VerifyResponse {
-    pub fn validate(&self) {
-        assert!(self.verified);
-        assert!(self.error.is_none());
-    }
 }
 
 pub fn get_seeded_rng() -> StdRng {

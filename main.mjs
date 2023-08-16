@@ -1,6 +1,13 @@
-import init, { deriveProof, sign, verify } from "./pkg/rdf_proofs_wasm.js";
+import init, { deriveProof, keyGen, sign, verify, verifyProof } from "./pkg/rdf_proofs_wasm.js";
 
 init().then(() => {
+  const keypair0 = keyGen();
+  const keypair1 = keyGen();
+  const keypair2 = keyGen();
+  console.log(`keypair0: ${JSON.stringify(keypair0, null, 2)}`);
+  console.log(`keypair1: ${JSON.stringify(keypair1, null, 2)}`);
+  console.log(`keypair2: ${JSON.stringify(keypair2, null, 2)}`);
+
   const unsecuredDocument = `
 <did:example:john> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Person> .
 <did:example:john> <http://schema.org/name> "John Smith" .
@@ -60,11 +67,12 @@ _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls
   _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls12_381-g2-pub001> .
   _:6b92db <https://w3id.org/security#proofValue> "${signature}"^^<https://w3id.org/security#multibase> .
   `;
-  console.log(`signedProof: ${signedProof}`);
 
   //////////////////////////////////////////
   // verify  
   //////////////////////////////////////////
+  console.log(`document: ${unsecuredDocument}`);
+  console.log(`proof: ${signedProof}`);
   const verified = verify(unsecuredDocument, signedProof, documentLoader);
   console.log(`verified: ${JSON.stringify(verified, null, 2)}`);
 
@@ -87,7 +95,7 @@ _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls
   <http://example.org/vcred/00> <https://www.w3.org/2018/credentials#expirationDate> "2025-01-01T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
   `;
   const vc_proof_ntriples_1 = `
-  _:6b92db <https://w3id.org/security#proofValue> "ugZveToWB9bUAm3RDFWeORovPDYdIgNWbsquhn334R78TCG86fad_3JiA6yh_f-bsnHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
+  _:6b92db <https://w3id.org/security#proofValue> "uhzr5tCpvFA-bebnJZBpUi2mkWStLGmZJm-c6crfIjUsYTbpNywgXUfbaOtD84V-UnHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
   _:6b92db <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .
   _:6b92db <https://w3id.org/security#cryptosuite> "bbs-termwise-signature-2023" .
   _:6b92db <http://purl.org/dc/terms/created> "2023-02-09T09:35:07Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
@@ -106,12 +114,12 @@ _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls
   <http://example.org/vicred/a> <https://www.w3.org/2018/credentials#expirationDate> "2023-12-31T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
   `;
   const vc_proof_ntriples_2 = `
-  _:wTnTxH <https://w3id.org/security#proofValue> "upqbT4ZPXjIRFKEQt5k-Bs5g_KG50zREjSMFH0wL5wkDAs7Ci2Qg58_EJLDffc2M0nHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
+  _:wTnTxH <https://w3id.org/security#proofValue> "usjQI4FuaD8udL2e5Rhvf4J4L0IOjmXT7Q3E40FXnIG-GQ6GMJkUuLv5tU1gJjW42nHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
   _:wTnTxH <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .
   _:wTnTxH <https://w3id.org/security#cryptosuite> "bbs-termwise-signature-2023" .
   _:wTnTxH <http://purl.org/dc/terms/created> "2023-02-03T09:49:25Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
   _:wTnTxH <https://w3id.org/security#proofPurpose> <https://w3id.org/security#assertionMethod> .
-  _:wTnTxH <https://w3id.org/security#verificationMethod> <did:example:issuer3#bls12_381-g2-pub001> .
+  _:wTnTxH <https://w3id.org/security#verificationMethod> <did:example:issuer3#bls12_381-g2-pub001> .  
   `;
   const disclosed_vc_ntriples_1 = `
   _:e0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Person> .
@@ -154,11 +162,6 @@ _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls
     "e3": "http://example.org/vicred/a"
   };
 
-  const verified1 = verify(vc_ntriples_1, vc_proof_ntriples_1, documentLoader);
-  console.log(`verified for vc1: ${JSON.stringify(verified1, null, 2)}`);
-  const verified2 = verify(vc_ntriples_2, vc_proof_ntriples_2, documentLoader);
-  console.log(`verified for vc2: ${JSON.stringify(verified2, null, 2)}`);
-
   const nonce = "abcde";
   const deriveProofRequest = {
     vc_with_disclosed: [
@@ -170,6 +173,9 @@ _:6b92db <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls
     document_loader: documentLoader,
   }
   console.log(`deriveProofRequest: ${JSON.stringify(deriveProofRequest, null, 2)}`);
-  const deriveProofResponse = deriveProof(deriveProofRequest);
-  console.log(`deriveProofResponse: ${deriveProofResponse}`);
+  const vp = deriveProof(deriveProofRequest);
+  console.log(`deriveProofResponse: ${vp}`);
+
+  const proofVerified = verifyProof(vp, nonce, documentLoader);
+  console.log(`proofVerified: ${JSON.stringify(proofVerified, null, 2)}`);
 });
