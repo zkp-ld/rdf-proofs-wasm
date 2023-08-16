@@ -2,11 +2,11 @@
   "name": "@zkp-ld/rdf-proofs-wasm",
   "author": "yamdan",
   "description": "WASM binding for rdf-proofs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zkp-ld/rdf-proofs-wasm"
+    "url": "git+https://github.com/zkp-ld/rdf-proofs-wasm.git"
   },
   "files": [
     "lib/*"
@@ -14,14 +14,14 @@
   "directories": {
     "lib": "lib"
   },
-  "module": "lib/rdf_proofs_wasm.js",
-  "types": "lib/rdf_proofs_wasm.d.ts",
-  "sideEffects": [
-    "./snippets/*"
-  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "build": "./scripts/build-package.sh DEBUG",
     "build:release": "./scripts/build-package.sh RELEASE",
     "build:profiling": "./scripts/build-package.sh PROFILING"
+  },
+  "devDependencies": {
+    "rollup": "^3.28.0"
   }
 }

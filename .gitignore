@@ -2,3 +2,4 @@
 /Cargo.lock
 /.devcontainer/
 /lib
+/node_modules/
