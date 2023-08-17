@@ -30,25 +30,30 @@ module.exports = {
 
 module.exports.keyGen = () => {
   requireWasmInitialized();
+
   return wasm.keyGen();
 }
 
 module.exports.sign = (document, proof, documentLoader) => {
   requireWasmInitialized();
+
   return wasm.sign(document, proof, documentLoader);
 }
 
 module.exports.verify = (document, proof, documentLoader) => {
   requireWasmInitialized();
+
   return wasm.verify(document, proof, documentLoader);
 }
 
 module.exports.deriveProof = (request) => {
   requireWasmInitialized();
+
   return wasm.deriveProof(request);
 }
 
 module.exports.verifyProof = (vp, nonce, documentLoader) => {
   requireWasmInitialized();
+  
   return wasm.verifyProof(vp, nonce, documentLoader);
 }
