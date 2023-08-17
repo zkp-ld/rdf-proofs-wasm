@@ -22,7 +22,7 @@ export function requireWasmInitialized(): void;
 export interface VerifyResult {
   readonly verified: boolean,
   readonly error?: string,
-};
+}
 
 /**
 * @returns {any}
@@ -43,7 +43,7 @@ export function sign(document: string, proof: string, documentLoader: string): s
 * @param {string} documentLoader
 * @returns {VerifyResult}
 */
-export function verify(document: string, proof: string, documentLoader: string): any;
+export function verify(document: string, proof: string, documentLoader: string): VerifyResult;
 
 /**
 * @param {any} request
@@ -57,4 +57,4 @@ export function deriveProof(request: any): string;
 * @param {string} documentLoader
 * @returns {VerifyResult}
 */
-export function verifyProof(vp: string, nonce: string, documentLoader: string): any;
+export function verifyProof(vp: string, nonce: string, documentLoader: string): VerifyResult;
