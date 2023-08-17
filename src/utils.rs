@@ -45,15 +45,32 @@ pub fn get_dataset_from_nquads_str(nquads: &str) -> Result<Dataset, RDFProofsWas
 
 #[derive(Serialize, Deserialize)]
 pub struct KeyPair {
+    #[serde(rename = "secretKey")]
     pub secret_key: String,
+    #[serde(rename = "publicKey")]
     pub public_key: String,
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct DeriveProofVcWithDisclosed {
+    #[serde(rename = "vcDocument")]
+    pub vc_document: String,
+    #[serde(rename = "vcProof")]
+    pub vc_proof: String,
+    #[serde(rename = "disclosedDocument")]
+    pub disclosed_document: String,
+    #[serde(rename = "disclosedProof")]
+    pub disclosed_proof: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct DeriveProofRequest {
-    pub vc_with_disclosed: Vec<(String, String, String, String)>,
+    #[serde(rename = "vcWithDisclosed")]
+    pub vc_with_disclosed: Vec<DeriveProofVcWithDisclosed>,
+    #[serde(rename = "deanonMap")]
     pub deanon_map: HashMap<String, String>,
     pub nonce: String,
+    #[serde(rename = "documentLoader")]
     pub document_loader: String,
 }
 
@@ -61,18 +78,25 @@ impl DeriveProofRequest {
     pub fn get_vc_with_disclosed(&self) -> Vec<VcWithDisclosed> {
         self.vc_with_disclosed
             .iter()
-            .map(|(doc, proof, disclosed_doc, disclosed_proof)| {
-                VcWithDisclosed::new(
-                    VerifiableCredential::new(
-                        get_graph_from_ntriples_str(doc).unwrap(),
-                        get_graph_from_ntriples_str(proof).unwrap(),
-                    ),
-                    VerifiableCredential::new(
-                        get_graph_from_ntriples_str(disclosed_doc).unwrap(),
-                        get_graph_from_ntriples_str(disclosed_proof).unwrap(),
-                    ),
-                )
-            })
+            .map(
+                |DeriveProofVcWithDisclosed {
+                     vc_document,
+                     vc_proof,
+                     disclosed_document,
+                     disclosed_proof,
+                 }| {
+                    VcWithDisclosed::new(
+                        VerifiableCredential::new(
+                            get_graph_from_ntriples_str(vc_document).unwrap(),
+                            get_graph_from_ntriples_str(vc_proof).unwrap(),
+                        ),
+                        VerifiableCredential::new(
+                            get_graph_from_ntriples_str(disclosed_document).unwrap(),
+                            get_graph_from_ntriples_str(disclosed_proof).unwrap(),
+                        ),
+                    )
+                },
+            )
             .collect()
     }
 

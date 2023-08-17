@@ -19,42 +19,73 @@ export function initializeWasm(): Promise<void>;
 export function isWasmInitialized(): boolean;
 export function requireWasmInitialized(): void;
 
+export interface KeyPair {
+  readonly secretKey: string;
+  readonly publicKey: string;
+}
+
 export interface VerifyResult {
-  readonly verified: boolean,
-  readonly error?: string,
+  readonly verified: boolean;
+  readonly error?: string;
+}
+
+export interface DeriveProofVcWithDisclosed {
+  readonly vcDocument: string;
+  readonly vcProof: string;
+  readonly disclosedDocument: string;
+  readonly disclosedProof: string;
+}
+
+export interface DeriveProofRequest {
+  readonly vcWithDisclosed: DeriveProofVcWithDisclosed[];
+  readonly deanonMap: Record<string, string>;
+  readonly nonce: string;
+  readonly documentLoader: string;
 }
 
 /**
-* @returns {any}
-*/
-export function keyGen(): any;
+ * @returns {KeyPair}
+ */
+export function keyGen(): KeyPair;
 
 /**
-* @param {string} document
-* @param {string} proof
-* @param {string} documentLoader
-* @returns {string}
-*/
-export function sign(document: string, proof: string, documentLoader: string): string;
+ * @param {string} document
+ * @param {string} proof
+ * @param {string} documentLoader
+ * @returns {string}
+ */
+export function sign(
+  document: string,
+  proof: string,
+  documentLoader: string,
+): string;
 
 /**
-* @param {string} document
-* @param {string} proof
-* @param {string} documentLoader
-* @returns {VerifyResult}
-*/
-export function verify(document: string, proof: string, documentLoader: string): VerifyResult;
+ * @param {string} document
+ * @param {string} proof
+ * @param {string} documentLoader
+ * @returns {VerifyResult}
+ */
+export function verify(
+  document: string,
+  proof: string,
+  documentLoader: string,
+): VerifyResult;
 
 /**
-* @param {any} request
-* @returns {string}
-*/
-export function deriveProof(request: any): string;
+ * @param {DeriveProofRequest} request
+ * @returns {string}
+ */
+export function deriveProof(request: DeriveProofRequest): string;
 
 /**
-* @param {string} vp
-* @param {string} nonce
-* @param {string} documentLoader
-* @returns {VerifyResult}
-*/
-export function verifyProof(vp: string, nonce: string, documentLoader: string): VerifyResult;
+ * @param {string} vp
+ * @param {string} nonce
+ * @param {string} documentLoader
+ * @returns {VerifyResult}
+ */
+export function verifyProof(
+  vp: string,
+  nonce: string,
+  documentLoader: string,
+): VerifyResult;
