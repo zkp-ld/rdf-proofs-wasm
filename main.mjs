@@ -1,4 +1,4 @@
-import init, { deriveProof, keyGen, sign, verify, verifyProof } from "./pkg/rdf_proofs_wasm.js";
+import init, { deriveProof, keyGen, sign, verify, verifyProof } from "./lib/index.web.js";
 
 init().then(() => {
   const keypair0 = keyGen();

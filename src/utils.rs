@@ -102,7 +102,7 @@ pub struct VerifyProofRequest {
 ////////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct VerifyResponse {
+pub struct VerifyResult {
     pub verified: bool,
     pub error: Option<String>,
 }

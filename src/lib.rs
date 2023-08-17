@@ -12,7 +12,7 @@ use rdf_proofs::{
     vc::VerifiableCredential,
 };
 use utils::{
-    get_dataset_from_nquads_str, set_panic_hook, DeriveProofRequest, KeyPair, VerifyResponse,
+    get_dataset_from_nquads_str, set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult,
 };
 use wasm_bindgen::prelude::*;
 
@@ -57,11 +57,11 @@ pub fn verify_caller(
     let vc = VerifiableCredential::new(unsecured_document, proof_config);
 
     match verify(&vc, &document_loader) {
-        Ok(()) => Ok(serde_wasm_bindgen::to_value(&VerifyResponse {
+        Ok(()) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,
             error: None,
         })?),
-        Err(e) => Ok(serde_wasm_bindgen::to_value(&VerifyResponse {
+        Err(e) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: false,
             error: Some(format!("{:?}", e)),
         })?),
@@ -108,11 +108,11 @@ pub fn verify_proof_caller(
         Some(nonce.as_bytes()),
         &document_loader,
     ) {
-        Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResponse {
+        Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,
             error: None,
         })?),
-        Err(e) => Ok(serde_wasm_bindgen::to_value(&VerifyResponse {
+        Err(e) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: false,
             error: Some(format!("{:?}", e)),
         })?),

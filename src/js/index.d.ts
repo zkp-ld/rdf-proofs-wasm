@@ -19,6 +19,11 @@ export function initializeWasm(): Promise<void>;
 export function isWasmInitialized(): boolean;
 export function requireWasmInitialized(): void;
 
+export interface VerifyResult {
+  readonly verified: boolean,
+  readonly error?: string,
+};
+
 /**
 * @returns {any}
 */
@@ -36,7 +41,7 @@ export function sign(document: string, proof: string, documentLoader: string): s
 * @param {string} document
 * @param {string} proof
 * @param {string} documentLoader
-* @returns {any}
+* @returns {VerifyResult}
 */
 export function verify(document: string, proof: string, documentLoader: string): any;
 
@@ -50,6 +55,6 @@ export function deriveProof(request: any): string;
 * @param {string} vp
 * @param {string} nonce
 * @param {string} documentLoader
-* @returns {any}
+* @returns {VerifyResult}
 */
 export function verifyProof(vp: string, nonce: string, documentLoader: string): any;

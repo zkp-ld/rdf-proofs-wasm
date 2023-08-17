@@ -16,6 +16,9 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "browser": {
+    "index.js": "lib/index.web.js"
+  },
   "scripts": {
     "build": "./scripts/build-package.sh DEBUG",
     "build:release": "./scripts/build-package.sh RELEASE",
