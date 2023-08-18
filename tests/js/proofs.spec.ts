@@ -168,12 +168,12 @@ _:wTnTxH <http://purl.org/dc/terms/created> "2023-02-03T09:49:25Z"^^<http://www.
 _:wTnTxH <https://w3id.org/security#proofPurpose> <https://w3id.org/security#assertionMethod> .
 _:wTnTxH <https://w3id.org/security#verificationMethod> <did:example:issuer3#bls12_381-g2-pub001> .
 `;
-    const deanonMap = {
-      e0: 'did:example:john',
-      e1: 'http://example.org/vaccine/a',
-      e2: 'http://example.org/vcred/00',
-      e3: 'http://example.org/vicred/a',
-    };
+    const deanonMap = new Map([
+      ['e0', 'did:example:john'],
+      ['e1', 'http://example.org/vaccine/a'],
+      ['e2', 'http://example.org/vcred/00'],
+      ['e3', 'http://example.org/vicred/a'],
+    ]);
     const nonce = 'abcde';
 
     const vcWithDisclosed1: DeriveProofVcWithDisclosed = {

@@ -38,7 +38,7 @@ export interface DeriveProofVcWithDisclosed {
 
 export interface DeriveProofRequest {
   readonly vcWithDisclosed: DeriveProofVcWithDisclosed[];
-  readonly deanonMap: Record<string, string>;
+  readonly deanonMap: Map<string, string>;
   readonly nonce: string;
   readonly documentLoader: string;
 }
