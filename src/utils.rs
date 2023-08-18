@@ -100,6 +100,7 @@ impl DeriveProofRequest {
             .collect()
     }
 
+    // TODO: support literals
     pub fn get_deanon_map(&self) -> HashMap<NamedOrBlankNode, Term> {
         self.deanon_map
             .iter()
