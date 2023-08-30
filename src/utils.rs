@@ -1,8 +1,9 @@
 use crate::error::RDFProofsWasmError;
 use ark_std::rand::{prelude::StdRng, SeedableRng};
-use oxrdf::{BlankNode, Dataset, Graph, NamedNode, NamedNodeRef, NamedOrBlankNode, Term};
+use oxrdf::{BlankNode, Dataset, Graph, Literal, NamedNode, NamedNodeRef, NamedOrBlankNode, Term};
 use oxttl::{NQuadsParser, NTriplesParser};
 use rdf_proofs::{proof::VcWithDisclosed, vc::VerifiableCredential};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -100,15 +101,38 @@ impl DeriveProofRequest {
             .collect()
     }
 
-    // TODO: support literals
-    pub fn get_deanon_map(&self) -> HashMap<NamedOrBlankNode, Term> {
+    pub fn get_deanon_map(&self) -> Result<HashMap<NamedOrBlankNode, Term>, RDFProofsWasmError> {
+        let re_iri = Regex::new(r"<([^>]+)>")?;
+        let re_blank_node = Regex::new(r"_:(.+)")?;
+        let re_simple_literal = Regex::new(r#""([^"]+)""#)?;
+        let re_typed_literal = Regex::new(r#""([^"]+)"^^<([^>]+)>"#)?;
+        let re_literal_with_langtag = Regex::new(r#""([^"]+)"@(.+)"#)?;
+
         self.deanon_map
             .iter()
             .map(|(k, v)| {
-                (
-                    BlankNode::new_unchecked(k).into(),
-                    NamedNode::new_unchecked(v).into(),
-                )
+                let key: NamedOrBlankNode = if let Some(caps) = re_blank_node.captures(k) {
+                    Ok(BlankNode::new_unchecked(&caps[1]).into())
+                } else if let Some(caps) = re_iri.captures(k) {
+                    Ok(NamedNode::new_unchecked(&caps[1]).into())
+                } else {
+                    Err(RDFProofsWasmError::InvalidDeanonMapFormat(k.to_string()))
+                }?;
+                let value: Term = if let Some(caps) = re_iri.captures(v) {
+                    Ok(NamedNode::new_unchecked(&caps[1]).into())
+                } else if let Some(caps) = re_simple_literal.captures(v) {
+                    Ok(Literal::new_simple_literal(&caps[1]).into())
+                } else if let Some(caps) = re_typed_literal.captures(v) {
+                    Ok(
+                        Literal::new_typed_literal(&caps[1], NamedNode::new_unchecked(&caps[2]))
+                            .into(),
+                    )
+                } else if let Some(caps) = re_literal_with_langtag.captures(v) {
+                    Ok(Literal::new_language_tagged_literal(&caps[1], &caps[2])?.into())
+                } else {
+                    Err(RDFProofsWasmError::InvalidDeanonMapFormat(v.to_string()))
+                }?;
+                Ok((key, value))
             })
             .collect()
     }

@@ -75,7 +75,7 @@ pub fn derive_proof_caller(request: JsValue) -> Result<String, JsValue> {
     let request: DeriveProofRequest = serde_wasm_bindgen::from_value(request)?;
     let mut rng = get_seeded_rng();
     let vcs = request.get_vc_with_disclosed();
-    let deanon_map = request.get_deanon_map();
+    let deanon_map = request.get_deanon_map()?;
     let nonce = &request.nonce;
     let document_loader: DocumentLoader =
         get_graph_from_ntriples_str(&request.document_loader)?.into();
@@ -83,7 +83,7 @@ pub fn derive_proof_caller(request: JsValue) -> Result<String, JsValue> {
         &mut rng,
         &vcs,
         &deanon_map,
-        Some(nonce.as_bytes()),
+        Some(nonce),
         &document_loader,
     )
     .map_err(RDFProofsWasmError::from)?;
@@ -105,7 +105,7 @@ pub fn verify_proof_caller(
     match verify_proof(
         &mut rng,
         &vp_dataset,
-        Some(nonce.as_bytes()),
+        Some(nonce),
         &document_loader,
     ) {
         Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
