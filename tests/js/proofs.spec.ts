@@ -176,6 +176,20 @@ _:b0 <http://purl.org/dc/terms/created> "2023-02-03T09:49:25Z"^^<http://www.w3.o
 _:b0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#assertionMethod> .
 _:b0 <https://w3id.org/security#verificationMethod> <did:example:issuer3#bls12_381-g2-pub001> .
 `;
+  const disclosedDoc1WithHiddenLiterals = `
+_:e0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Person> .
+_:e0 <http://example.org/vocab/isPatientOf> _:b0 .
+_:e0 <http://schema.org/worksFor> _:b1 .
+_:b0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/vocab/Vaccination> .
+_:b0 <http://example.org/vocab/vaccinationDate> _:vdate .
+_:b0 <http://example.org/vocab/vaccine> _:e1 .
+_:b1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Organization> .
+_:e2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .
+_:e2 <https://www.w3.org/2018/credentials#credentialSubject> _:e0 .
+_:e2 <https://www.w3.org/2018/credentials#issuer> <did:example:issuer0> .
+_:e2 <https://www.w3.org/2018/credentials#issuanceDate> "2022-01-01T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+_:e2 <https://www.w3.org/2018/credentials#expirationDate> "2025-01-01T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+`;
 
   test('deriveProof', async () => {
     await initializeWasm();
@@ -241,6 +255,46 @@ _:b0 <https://w3id.org/security#verificationMethod> <did:example:issuer3#bls12_3
     expect(() => {
       deriveProof(req);
     }).toThrow('InvalidDeanonMapFormat("e0")');
+  });
+
+  test('deriveProof with hidden literals', async () => {
+    await initializeWasm();
+
+    const deanonMap = new Map([
+      ['_:e0', '<did:example:john>'],
+      ['_:e1', '<http://example.org/vaccine/a>'],
+      ['_:e2', '<http://example.org/vcred/00>'],
+      ['_:e3', '<http://example.org/vicred/a>'],
+      [
+        '_:vdate',
+        '"2022-01-01T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>',
+      ],
+    ]);
+    const nonce = 'abcde';
+
+    const vcWithDisclosed1: DeriveProofVcWithDisclosed = {
+      vcDocument: doc1,
+      vcProof: proof1,
+      disclosedDocument: disclosedDoc1WithHiddenLiterals,
+      disclosedProof: disclosedProof1,
+    };
+    const vcWithDisclosed2: DeriveProofVcWithDisclosed = {
+      vcDocument: doc2,
+      vcProof: proof2,
+      disclosedDocument: disclosedDoc2,
+      disclosedProof: disclosedProof2,
+    };
+
+    const req: DeriveProofRequest = {
+      vcWithDisclosed: [vcWithDisclosed1, vcWithDisclosed2],
+      deanonMap,
+      nonce,
+      documentLoader,
+    };
+    const vp = deriveProof(req);
+    console.log(`vp: ${vp}`);
+
+    expect(vp).toBeTruthy();
   });
 
   test('verifyProof', async () => {

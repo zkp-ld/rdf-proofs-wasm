@@ -102,11 +102,11 @@ impl DeriveProofRequest {
     }
 
     pub fn get_deanon_map(&self) -> Result<HashMap<NamedOrBlankNode, Term>, RDFProofsWasmError> {
-        let re_iri = Regex::new(r"<([^>]+)>")?;
-        let re_blank_node = Regex::new(r"_:(.+)")?;
-        let re_simple_literal = Regex::new(r#""([^"]+)""#)?;
-        let re_typed_literal = Regex::new(r#""([^"]+)"^^<([^>]+)>"#)?;
-        let re_literal_with_langtag = Regex::new(r#""([^"]+)"@(.+)"#)?;
+        let re_iri = Regex::new(r"^<([^>]+)>$")?;
+        let re_blank_node = Regex::new(r"^_:(.+)$")?;
+        let re_simple_literal = Regex::new(r#"^"([^"]+)"$"#)?;
+        let re_typed_literal = Regex::new(r#"^"([^"]+)"\^\^<([^>]+)>$"#)?;
+        let re_literal_with_langtag = Regex::new(r#"^"([^"]+)"@(.+)$"#)?;
 
         self.deanon_map
             .iter()
@@ -118,6 +118,7 @@ impl DeriveProofRequest {
                 } else {
                     Err(RDFProofsWasmError::InvalidDeanonMapFormat(k.to_string()))
                 }?;
+
                 let value: Term = if let Some(caps) = re_iri.captures(v) {
                     Ok(NamedNode::new_unchecked(&caps[1]).into())
                 } else if let Some(caps) = re_simple_literal.captures(v) {
@@ -132,6 +133,7 @@ impl DeriveProofRequest {
                 } else {
                     Err(RDFProofsWasmError::InvalidDeanonMapFormat(v.to_string()))
                 }?;
+
                 Ok((key, value))
             })
             .collect()
