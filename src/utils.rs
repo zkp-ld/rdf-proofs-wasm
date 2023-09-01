@@ -30,16 +30,14 @@ pub fn get_object_value_for_predicate(
 
 pub fn get_graph_from_ntriples_str(ntriples: &str) -> Result<Graph, RDFProofsWasmError> {
     let iter = NTriplesParser::new()
-        .parse_from_read(ntriples.as_bytes())
-        .into_iter()
+        .parse_read(ntriples.as_bytes())
         .collect::<Result<Vec<_>, _>>()?;
     Ok(Graph::from_iter(iter))
 }
 
 pub fn get_dataset_from_nquads_str(nquads: &str) -> Result<Dataset, RDFProofsWasmError> {
     let iter = NQuadsParser::new()
-        .parse_from_read(nquads.as_bytes())
-        .into_iter()
+        .parse_read(nquads.as_bytes())
         .collect::<Result<Vec<_>, _>>()?;
     Ok(Dataset::from_iter(iter))
 }

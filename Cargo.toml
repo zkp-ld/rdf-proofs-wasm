@@ -1,6 +1,6 @@
 [package]
 name = "rdf-proofs-wasm"
-version = "0.8.0"
+version = "0.9.0"
 edition = "2021"
 authors = ["yamdan"]
 license = "MIT"
@@ -20,12 +20,12 @@ serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = "0.5"
 wasm-bindgen = "0.2"
 js-sys = "0.3"
-rdf-proofs = { git = "https://github.com/zkp-ld/rdf-proofs.git", version = "0.4.0", default-features = false, features = [
+rdf-proofs = { git = "https://github.com/zkp-ld/rdf-proofs.git", version = "0.5.0", default-features = false, features = [
     "wasmer-js",
 ] }
-rdf-canon = { git = "https://github.com/zkp-ld/rdf-canon.git", version = "0.13.0" }
-oxrdf = { git = "https://github.com/oxigraph/oxigraph.git", rev = "922023b" } # to be fixed once Oxigraph v0.4 is released
-oxttl = { git = "https://github.com/oxigraph/oxigraph.git", rev = "922023b" } # will be fixed once oxttl is published on crates.io
+rdf-canon = { git = "https://github.com/zkp-ld/rdf-canon.git", version = "0.14.0" }
+oxrdf = { git = "https://github.com/oxigraph/oxigraph.git", rev = "f10e5a4" } # to be fixed once Oxigraph v0.4 is released
+oxttl = { git = "https://github.com/oxigraph/oxigraph.git", rev = "f10e5a4" } # will be fixed once oxttl is published on crates.io
 ark-std = { version = "0.4", default-features = false }
 web-sys = { version = "0.3", features = ["console"] }
 regex = "1.9"
