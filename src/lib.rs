@@ -1,19 +1,14 @@
 mod error;
 mod utils;
 
-use crate::utils::{get_graph_from_ntriples_str, get_object_value_for_predicate, get_seeded_rng};
+use crate::utils::get_seeded_rng;
 use error::RDFProofsWasmError;
 use rdf_proofs::{
-    context::PROOF_VALUE,
-    keygen::{generate_keypair, serialize_public_key, serialize_secret_key},
-    loader::DocumentLoader,
-    proof::{derive_proof, verify_proof},
-    signature::{sign, verify},
-    vc::VerifiableCredential,
+    derive_proof_string,
+    key_gen::{generate_keypair, serialize_public_key, serialize_secret_key},
+    sign_string, verify_proof_string, verify_string, VcPairString,
 };
-use utils::{
-    get_dataset_from_nquads_str, set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult,
-};
+use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_name = keyGen)]
@@ -31,32 +26,20 @@ pub fn key_gen_caller() -> Result<JsValue, JsValue> {
 }
 
 #[wasm_bindgen(js_name = sign)]
-pub fn sign_caller(document: &str, proof: &str, document_loader: &str) -> Result<String, JsValue> {
+pub fn sign_caller(document: &str, proof: &str, key_graph: &str) -> Result<String, JsValue> {
     set_panic_hook();
 
-    let document_loader: DocumentLoader = get_graph_from_ntriples_str(document_loader)?.into();
-    let unsecured_document = get_graph_from_ntriples_str(document)?;
-    let proof_config = get_graph_from_ntriples_str(proof)?;
-    let mut vc = VerifiableCredential::new(unsecured_document, proof_config);
     let mut rng = get_seeded_rng();
-    sign(&mut rng, &mut vc, &document_loader).map_err(RDFProofsWasmError::from)?;
-    Ok(get_object_value_for_predicate(&vc.proof, PROOF_VALUE)?)
+    let proof_value =
+        sign_string(&mut rng, document, proof, key_graph).map_err(RDFProofsWasmError::from)?;
+    Ok(proof_value)
 }
 
 #[wasm_bindgen(js_name = verify)]
-pub fn verify_caller(
-    document: &str,
-    proof: &str,
-    document_loader: &str,
-) -> Result<JsValue, JsValue> {
+pub fn verify_caller(document: &str, proof: &str, key_graph: &str) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
-    let document_loader: DocumentLoader = get_graph_from_ntriples_str(document_loader)?.into();
-    let unsecured_document = get_graph_from_ntriples_str(document)?;
-    let proof_config = get_graph_from_ntriples_str(proof)?;
-    let vc = VerifiableCredential::new(unsecured_document, proof_config);
-
-    match verify(&vc, &document_loader) {
+    match verify_string(document, proof, key_graph) {
         Ok(()) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,
             error: None,
@@ -74,29 +57,36 @@ pub fn derive_proof_caller(request: JsValue) -> Result<String, JsValue> {
 
     let request: DeriveProofRequest = serde_wasm_bindgen::from_value(request)?;
     let mut rng = get_seeded_rng();
-    let vcs = request.get_vc_with_disclosed();
-    let deanon_map = request.get_deanon_map()?;
-    let nonce = &request.nonce;
-    let document_loader: DocumentLoader =
-        get_graph_from_ntriples_str(&request.document_loader)?.into();
-    let vp = derive_proof(&mut rng, &vcs, &deanon_map, Some(nonce), &document_loader)
-        .map_err(RDFProofsWasmError::from)?;
-    Ok(rdf_canon::serialize(&vp))
+    let vc_pairs = request
+        .vc_pairs
+        .into_iter()
+        .map(|vc_pair| {
+            VcPairString::new(
+                &vc_pair.original_document,
+                &vc_pair.original_proof,
+                &vc_pair.disclosed_document,
+                &vc_pair.disclosed_proof,
+            )
+        })
+        .collect();
+    let vp = derive_proof_string(
+        &mut rng,
+        &vc_pairs,
+        &request.deanon_map,
+        Some(&request.nonce),
+        &request.key_graph,
+    )
+    .map_err(RDFProofsWasmError::from)?;
+    Ok(vp)
 }
 
 #[wasm_bindgen(js_name = verifyProof)]
-pub fn verify_proof_caller(
-    vp: &str,
-    nonce: &str,
-    document_loader: &str,
-) -> Result<JsValue, JsValue> {
+pub fn verify_proof_caller(vp: &str, nonce: &str, key_graph: &str) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
-    let document_loader: DocumentLoader = get_graph_from_ntriples_str(document_loader)?.into();
-    let vp_dataset = get_dataset_from_nquads_str(vp)?;
     let mut rng = get_seeded_rng();
 
-    match verify_proof(&mut rng, &vp_dataset, Some(nonce), &document_loader) {
+    match verify_proof_string(&mut rng, vp, Some(nonce), key_graph) {
         Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,
             error: None,

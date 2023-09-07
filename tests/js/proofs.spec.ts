@@ -6,9 +6,9 @@ import {
   verify,
   verifyProof,
 } from '../../lib';
-import { DeriveProofVcWithDisclosed } from '../../src/js';
+import { DeriveProofVcPair } from '../../src/js';
 
-const documentLoader = `
+const keyGraph = `
 # issuer0
 <did:example:issuer0> <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls12_381-g2-pub001> .
 <did:example:issuer0#bls12_381-g2-pub001> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#Multikey> .
@@ -53,7 +53,7 @@ _:b0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#asserti
 _:b0 <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls12_381-g2-pub001> .
 `;
 
-    const signature = sign(doc, proof, documentLoader);
+    const signature = sign(doc, proof, keyGraph);
     console.log(`signature: ${signature}`);
 
     expect(signature).toBeDefined();
@@ -89,7 +89,7 @@ _:b0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#asserti
 _:b0 <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls12_381-g2-pub001> .
 `;
 
-    const verified = verify(doc, proof, documentLoader);
+    const verified = verify(doc, proof, keyGraph);
     console.log(`verified: ${JSON.stringify(verified, null, 2)}`);
 
     expect(verified.verified).toBeTruthy();
@@ -202,24 +202,24 @@ _:e2 <https://www.w3.org/2018/credentials#expirationDate> "2025-01-01T00:00:00Z"
     ]);
     const nonce = 'abcde';
 
-    const vcWithDisclosed1: DeriveProofVcWithDisclosed = {
-      vcDocument: doc1,
-      vcProof: proof1,
+    const vcPair1: DeriveProofVcPair = {
+      originalDocument: doc1,
+      originalProof: proof1,
       disclosedDocument: disclosedDoc1,
       disclosedProof: disclosedProof1,
     };
-    const vcWithDisclosed2: DeriveProofVcWithDisclosed = {
-      vcDocument: doc2,
-      vcProof: proof2,
+    const vcPair2: DeriveProofVcPair = {
+      originalDocument: doc2,
+      originalProof: proof2,
       disclosedDocument: disclosedDoc2,
       disclosedProof: disclosedProof2,
     };
 
     const req: DeriveProofRequest = {
-      vcWithDisclosed: [vcWithDisclosed1, vcWithDisclosed2],
+      vcPairs: [vcPair1, vcPair2],
       deanonMap,
       nonce,
-      documentLoader,
+      keyGraph,
     };
     const vp = deriveProof(req);
     console.log(`vp: ${vp}`);
@@ -238,18 +238,18 @@ _:e2 <https://www.w3.org/2018/credentials#expirationDate> "2025-01-01T00:00:00Z"
     ]);
     const nonce = 'abcde';
 
-    const vcWithDisclosed1: DeriveProofVcWithDisclosed = {
-      vcDocument: doc1,
-      vcProof: proof1,
+    const vcPair1: DeriveProofVcPair = {
+      originalDocument: doc1,
+      originalProof: proof1,
       disclosedDocument: disclosedDoc1,
       disclosedProof: disclosedProof1,
     };
 
     const req: DeriveProofRequest = {
-      vcWithDisclosed: [vcWithDisclosed1],
+      vcPairs: [vcPair1],
       deanonMap,
       nonce,
-      documentLoader,
+      keyGraph,
     };
 
     expect(() => {
@@ -272,24 +272,24 @@ _:e2 <https://www.w3.org/2018/credentials#expirationDate> "2025-01-01T00:00:00Z"
     ]);
     const nonce = 'abcde';
 
-    const vcWithDisclosed1: DeriveProofVcWithDisclosed = {
-      vcDocument: doc1,
-      vcProof: proof1,
+    const vcPair1: DeriveProofVcPair = {
+      originalDocument: doc1,
+      originalProof: proof1,
       disclosedDocument: disclosedDoc1WithHiddenLiterals,
       disclosedProof: disclosedProof1,
     };
-    const vcWithDisclosed2: DeriveProofVcWithDisclosed = {
-      vcDocument: doc2,
-      vcProof: proof2,
+    const vcPair2: DeriveProofVcPair = {
+      originalDocument: doc2,
+      originalProof: proof2,
       disclosedDocument: disclosedDoc2,
       disclosedProof: disclosedProof2,
     };
 
     const req: DeriveProofRequest = {
-      vcWithDisclosed: [vcWithDisclosed1, vcWithDisclosed2],
+      vcPairs: [vcPair1, vcPair2],
       deanonMap,
       nonce,
-      documentLoader,
+      keyGraph,
     };
     const vp = deriveProof(req);
     console.log(`vp: ${vp}`);
@@ -344,7 +344,7 @@ _:c14n9 <https://www.w3.org/2018/credentials#issuer> <did:example:issuer3> _:c14
 `;
     const nonce = 'abcde';
 
-    const verified = verifyProof(vp, nonce, documentLoader);
+    const verified = verifyProof(vp, nonce, keyGraph);
     console.log(`verified: ${JSON.stringify(verified, null, 2)}`);
 
     expect(verified.verified).toBeTruthy();

@@ -1,4 +1,4 @@
-// This WASM setup script is based on:
+// This WASM setup script is partially based on:
 // [docknetwork/crypto-wasm](https://github.com/docknetwork/crypto-wasm) and
 // [mattrglobal/bbs-signatures](https://github.com/mattrglobal/bbs-signatures)
 
@@ -29,18 +29,18 @@ export interface VerifyResult {
   readonly error?: string;
 }
 
-export interface DeriveProofVcWithDisclosed {
-  readonly vcDocument: string;
-  readonly vcProof: string;
+export interface DeriveProofVcPair {
+  readonly originalDocument: string;
+  readonly originalProof: string;
   readonly disclosedDocument: string;
   readonly disclosedProof: string;
 }
 
 export interface DeriveProofRequest {
-  readonly vcWithDisclosed: DeriveProofVcWithDisclosed[];
+  readonly vcPairs: DeriveProofVcPair[];
   readonly deanonMap: Map<string, string>;
   readonly nonce: string;
-  readonly documentLoader: string;
+  readonly keyGraph: string;
 }
 
 /**
@@ -51,25 +51,21 @@ export function keyGen(): KeyPair;
 /**
  * @param {string} document
  * @param {string} proof
- * @param {string} documentLoader
+ * @param {string} keyGraph
  * @returns {string}
  */
-export function sign(
-  document: string,
-  proof: string,
-  documentLoader: string,
-): string;
+export function sign(document: string, proof: string, keyGraph: string): string;
 
 /**
  * @param {string} document
  * @param {string} proof
- * @param {string} documentLoader
+ * @param {string} keyGraph
  * @returns {VerifyResult}
  */
 export function verify(
   document: string,
   proof: string,
-  documentLoader: string,
+  keyGraph: string,
 ): VerifyResult;
 
 /**
@@ -81,11 +77,11 @@ export function deriveProof(request: DeriveProofRequest): string;
 /**
  * @param {string} vp
  * @param {string} nonce
- * @param {string} documentLoader
+ * @param {string} keyGraph
  * @returns {VerifyResult}
  */
 export function verifyProof(
   vp: string,
   nonce: string,
-  documentLoader: string,
+  keyGraph: string,
 ): VerifyResult;

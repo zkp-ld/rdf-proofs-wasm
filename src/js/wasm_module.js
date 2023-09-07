@@ -34,16 +34,16 @@ module.exports.keyGen = () => {
   return wasm.keyGen();
 }
 
-module.exports.sign = (document, proof, documentLoader) => {
+module.exports.sign = (document, proof, keyGraph) => {
   requireWasmInitialized();
 
-  return wasm.sign(document, proof, documentLoader);
+  return wasm.sign(document, proof, keyGraph);
 }
 
-module.exports.verify = (document, proof, documentLoader) => {
+module.exports.verify = (document, proof, keyGraph) => {
   requireWasmInitialized();
 
-  return wasm.verify(document, proof, documentLoader);
+  return wasm.verify(document, proof, keyGraph);
 }
 
 module.exports.deriveProof = (request) => {
@@ -52,8 +52,8 @@ module.exports.deriveProof = (request) => {
   return wasm.deriveProof(request);
 }
 
-module.exports.verifyProof = (vp, nonce, documentLoader) => {
+module.exports.verifyProof = (vp, nonce, keyGraph) => {
   requireWasmInitialized();
-  
-  return wasm.verifyProof(vp, nonce, documentLoader);
+
+  return wasm.verifyProof(vp, nonce, keyGraph);
 }
