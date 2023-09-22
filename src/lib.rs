@@ -4,9 +4,9 @@ mod utils;
 use crate::utils::get_seeded_rng;
 use error::RDFProofsWasmError;
 use rdf_proofs::{
-    blind_sign_request_string, blind_sign_string, blind_verify_string, derive_proof_string,
-    key_gen::{generate_keypair, serialize_public_key, serialize_secret_key},
-    sign_string, unblind_string, verify_proof_string, verify_string, VcPairString,
+    ark_to_base64url, blind_sign_request_string, blind_sign_string, blind_verify_string,
+    derive_proof_string, key_gen::generate_keypair, sign_string, unblind_string,
+    verify_proof_string, verify_string, VcPairString,
 };
 use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult};
 use wasm_bindgen::prelude::*;
@@ -17,8 +17,8 @@ pub fn key_gen_caller() -> Result<JsValue, JsValue> {
 
     let mut rng = get_seeded_rng();
     let keypair = generate_keypair(&mut rng).map_err(RDFProofsWasmError::from)?;
-    let secret_key = serialize_secret_key(&keypair.secret_key).map_err(RDFProofsWasmError::from)?;
-    let public_key = serialize_public_key(&keypair.public_key).map_err(RDFProofsWasmError::from)?;
+    let secret_key = ark_to_base64url(&keypair.secret_key).map_err(RDFProofsWasmError::from)?;
+    let public_key = ark_to_base64url(&keypair.public_key).map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&KeyPair {
         secret_key,
         public_key,
