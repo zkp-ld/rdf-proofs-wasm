@@ -29,6 +29,11 @@ export interface VerifyResult {
   readonly error?: string;
 }
 
+export interface BlindSignRequest {
+  readonly request: string;
+  readonly blinding: string;
+}
+
 export interface DeriveProofVcPair {
   readonly originalDocument: string;
   readonly originalProof: string;
@@ -37,6 +42,7 @@ export interface DeriveProofVcPair {
 }
 
 export interface DeriveProofRequest {
+  readonly secret?: Uint8Array;
   readonly vcPairs: DeriveProofVcPair[];
   readonly deanonMap: Map<string, string>;
   readonly nonce: string;
@@ -63,6 +69,58 @@ export function sign(document: string, proof: string, keyGraph: string): string;
  * @returns {VerifyResult}
  */
 export function verify(
+  document: string,
+  proof: string,
+  keyGraph: string,
+): VerifyResult;
+
+/**
+ * @param {Uint8Array} secret
+ * @param {string} nonce
+ * @returns {BlindSignRequest}
+ */
+export function blindSignRequest(
+  secret: Uint8Array,
+  nonce: string,
+): BlindSignRequest;
+
+/**
+ * @param {string} request
+ * @param {string} nonce
+ * @param {string} document
+ * @param {string} proof
+ * @param {string} keyGraph
+ * @returns {string}
+ */
+export function blindSign(
+  request: string,
+  nonce: string,
+  document: string,
+  proof: string,
+  keyGraph: string,
+): string;
+
+/**
+ * @param {string} document
+ * @param {string} proof
+ * @param {string} blinding
+ * @returns {string}
+ */
+export function unblind(
+  document: string,
+  proof: string,
+  blinding: string,
+): string;
+
+/**
+ * @param {Uint8Array} secret
+ * @param {string} document
+ * @param {string} proof
+ * @param {string} keyGraph
+ * @returns {VerifyResult}
+ */
+export function blindVerify(
+  secret: Uint8Array,
   document: string,
   proof: string,
   keyGraph: string,
