@@ -18,6 +18,12 @@ pub struct KeyPair {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct BlindSignRequest {
+    pub request: String,
+    pub blinding: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct DeriveProofVcPair {
     #[serde(rename = "originalDocument")]
     pub original_document: String,
@@ -31,6 +37,7 @@ pub struct DeriveProofVcPair {
 
 #[derive(Serialize, Deserialize)]
 pub struct DeriveProofRequest {
+    pub secret: Option<Vec<u8>>,
     #[serde(rename = "vcPairs")]
     pub vc_pairs: Vec<DeriveProofVcPair>,
     #[serde(rename = "deanonMap")]

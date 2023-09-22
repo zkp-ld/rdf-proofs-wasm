@@ -46,6 +46,30 @@ module.exports.verify = (document, proof, keyGraph) => {
   return wasm.verify(document, proof, keyGraph);
 }
 
+module.exports.blindSignRequest = (secret, nonce) => {
+  requireWasmInitialized();
+
+  return wasm.blindSignRequest(secret, nonce);
+}
+
+module.exports.blindSign = (request, nonce, document, proof, keyGraph) => {
+  requireWasmInitialized();
+
+  return wasm.blindSign(request, nonce, document, proof, keyGraph);
+}
+
+module.exports.unblind = (document, proof, blinding) => {
+  requireWasmInitialized();
+
+  return wasm.unblind(document, proof, blinding);
+}
+
+module.exports.blindVerify = (secret, document, proof, keyGraph) => {
+  requireWasmInitialized();
+
+  return wasm.blindVerify(secret, document, proof, keyGraph);
+}
+
 module.exports.deriveProof = (request) => {
   requireWasmInitialized();
 
