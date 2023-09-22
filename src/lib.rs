@@ -63,7 +63,8 @@ pub fn blind_sign_request_caller(secret: &[u8], nonce: &str) -> Result<JsValue, 
 
 #[wasm_bindgen(js_name = blindSign)]
 pub fn blind_sign_caller(
-    request: &str,
+    commitment: &str,
+    pok_for_commitment: &str,
     nonce: &str,
     document: &str,
     proof: &str,
@@ -72,8 +73,16 @@ pub fn blind_sign_caller(
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
-    let proof_value = blind_sign_string(&mut rng, request, Some(nonce), document, proof, key_graph)
-        .map_err(RDFProofsWasmError::from)?;
+    let proof_value = blind_sign_string(
+        &mut rng,
+        commitment,
+        pok_for_commitment,
+        Some(nonce),
+        document,
+        proof,
+        key_graph,
+    )
+    .map_err(RDFProofsWasmError::from)?;
     Ok(proof_value)
 }
 

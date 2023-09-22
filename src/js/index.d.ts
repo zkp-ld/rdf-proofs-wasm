@@ -30,7 +30,8 @@ export interface VerifyResult {
 }
 
 export interface BlindSignRequest {
-  readonly request: string;
+  readonly commitment: string;
+  readonly pokForCommitment: string;
   readonly blinding: string;
 }
 
@@ -85,7 +86,8 @@ export function blindSignRequest(
 ): BlindSignRequest;
 
 /**
- * @param {string} request
+ * @param {string} commitment
+ * @param {string} pokForCommitment
  * @param {string} nonce
  * @param {string} document
  * @param {string} proof
@@ -93,7 +95,8 @@ export function blindSignRequest(
  * @returns {string}
  */
 export function blindSign(
-  request: string,
+  commitment: string,
+  pokForCommitment: string,
   nonce: string,
   document: string,
   proof: string,

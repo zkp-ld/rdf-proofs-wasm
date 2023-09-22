@@ -119,11 +119,16 @@ describe('Blind Signatures', () => {
 
     const secret = new Uint8Array(Buffer.from('SECRET'));
     const nonce = 'NONCE';
-    const { request, blinding } = blindSignRequest(secret, nonce);
-    expect(request).toBeDefined();
+    const { commitment, pokForCommitment, blinding } = blindSignRequest(
+      secret,
+      nonce,
+    );
+    expect(commitment).toBeDefined();
+    expect(pokForCommitment).toBeDefined();
 
     const blindedProof = blindSign(
-      request,
+      commitment,
+      pokForCommitment,
       nonce,
       doc1,
       proofWithoutProofvalue1,
