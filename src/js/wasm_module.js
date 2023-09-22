@@ -52,10 +52,10 @@ module.exports.blindSignRequest = (secret, nonce) => {
   return wasm.blindSignRequest(secret, nonce);
 }
 
-module.exports.blindSign = (request, nonce, document, proof, keyGraph) => {
+module.exports.blindSign = (commitment, pokForCommitment, nonce, document, proof, keyGraph) => {
   requireWasmInitialized();
 
-  return wasm.blindSign(request, nonce, document, proof, keyGraph);
+  return wasm.blindSign(commitment, pokForCommitment, nonce, document, proof, keyGraph);
 }
 
 module.exports.unblind = (document, proof, blinding) => {

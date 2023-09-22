@@ -18,12 +18,6 @@ pub struct KeyPair {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct BlindSignRequest {
-    pub request: String,
-    pub blinding: String,
-}
-
-#[derive(Serialize, Deserialize)]
 pub struct DeriveProofVcPair {
     #[serde(rename = "originalDocument")]
     pub original_document: String,
