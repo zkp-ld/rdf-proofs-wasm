@@ -4,9 +4,7 @@ import {
   blindSign,
   deriveProof,
   initializeWasm,
-  sign,
   unblind,
-  verify,
   verifyProof,
   blindVerify,
 } from '../../lib';
