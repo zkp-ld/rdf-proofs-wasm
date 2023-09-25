@@ -7,6 +7,7 @@ import {
   unblind,
   verifyProof,
   blindVerify,
+  verifyBlindSignRequest,
 } from '../../lib';
 import { DeriveProofVcPair } from '../../src/js';
 
@@ -118,29 +119,34 @@ describe('Blind Signatures', () => {
     await initializeWasm();
 
     const secret = new Uint8Array(Buffer.from('SECRET'));
-    const nonce = 'NONCE';
+    const challenge = 'challenge';
     const { commitment, pokForCommitment, blinding } = blindSignRequest(
       secret,
-      nonce,
+      challenge,
     );
     expect(commitment).toBeDefined();
     expect(pokForCommitment).toBeDefined();
 
     const blindedProof = blindSign(
       commitment,
-      pokForCommitment,
-      nonce,
       doc1,
       proofWithoutProofvalue1,
       keyGraph,
     );
     expect(blindedProof).toBeDefined();
 
+    const requestVerified = verifyBlindSignRequest(
+      commitment,
+      pokForCommitment,
+      challenge,
+    );
+    expect(requestVerified.verified).toBeTruthy();
+
     const proof = unblind(doc1, blindedProof, blinding);
     expect(proof).toBeDefined();
 
     const verified = blindVerify(secret, doc1, proof, keyGraph);
-    expect(verified).toBeTruthy();
+    expect(verified.verified).toBeTruthy();
   });
 
   test('deriveProof with secret', async () => {
@@ -153,7 +159,7 @@ describe('Blind Signatures', () => {
       ['_:e3', '<http://example.org/vicred/a>'],
     ]);
     const secret = new Uint8Array(Buffer.from('SECRET'));
-    const nonce = 'abcde';
+    const challenge = 'abcde';
 
     const vcPair1: DeriveProofVcPair = {
       originalDocument: doc1,
@@ -169,18 +175,64 @@ describe('Blind Signatures', () => {
     };
 
     const req: DeriveProofRequest = {
-      secret,
       vcPairs: [vcPair1, vcPair2],
       deanonMap,
-      nonce,
       keyGraph,
+      challenge,
+      secret,
     };
-    const vp = deriveProof(req);
+    const { vp } = deriveProof(req);
     console.log(`vp: ${vp}`);
 
     expect(vp).toBeTruthy();
 
-    const verified = verifyProof(vp, nonce, keyGraph);
+    const verified = verifyProof(vp, keyGraph, challenge);
+    expect(verified.verified).toBeTruthy();
+  });
+
+  test('deriveProof with domain and secret commitment', async () => {
+    await initializeWasm();
+
+    const deanonMap = new Map([
+      ['_:e0', '<did:example:john>'],
+      ['_:e1', '<http://example.org/vaccine/a>'],
+      ['_:e2', '<http://example.org/vcred/00>'],
+      ['_:e3', '<http://example.org/vicred/a>'],
+    ]);
+    const secret = new Uint8Array(Buffer.from('SECRET'));
+    const challenge = 'abcde';
+    const domain = 'example.org';
+
+    const vcPair1: DeriveProofVcPair = {
+      originalDocument: doc1,
+      originalProof: boundProof1,
+      disclosedDocument: disclosedDoc1,
+      disclosedProof: disclosedBoundProof1,
+    };
+    const vcPair2: DeriveProofVcPair = {
+      originalDocument: doc2,
+      originalProof: proof2,
+      disclosedDocument: disclosedDoc2,
+      disclosedProof: disclosedProof2,
+    };
+
+    const req: DeriveProofRequest = {
+      vcPairs: [vcPair1, vcPair2],
+      deanonMap,
+      keyGraph,
+      challenge,
+      domain,
+      secret,
+      commitSecret: true,
+    };
+    const { vp, blinding } = deriveProof(req);
+    console.log(`vp: ${vp}`);
+    console.log(`blinding: ${blinding}`);
+
+    expect(vp).toBeTruthy();
+    expect(blinding).toBeDefined();
+
+    const verified = verifyProof(vp, keyGraph, challenge, domain);
     expect(verified.verified).toBeTruthy();
   });
 });

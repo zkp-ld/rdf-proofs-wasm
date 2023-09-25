@@ -31,21 +31,24 @@ pub struct DeriveProofVcPair {
 
 #[derive(Serialize, Deserialize)]
 pub struct DeriveProofRequest {
-    pub secret: Option<Vec<u8>>,
     #[serde(rename = "vcPairs")]
     pub vc_pairs: Vec<DeriveProofVcPair>,
     #[serde(rename = "deanonMap")]
     pub deanon_map: HashMap<String, String>,
-    pub nonce: String,
     #[serde(rename = "keyGraph")]
     pub key_graph: String,
+    pub challenge: Option<String>,
+    pub domain: Option<String>,
+    pub secret: Option<Vec<u8>>,
+    #[serde(rename = "commitSecret")]
+    pub commit_secret: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct VerifyProofRequest {
     pub vc_pairs: Vec<(String, String, String, String)>,
     pub deanon_map: HashMap<String, String>,
-    pub nonce: String,
+    pub challenge: String,
     pub document_loader: String,
 }
 

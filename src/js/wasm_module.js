@@ -46,16 +46,22 @@ module.exports.verify = (document, proof, keyGraph) => {
   return wasm.verify(document, proof, keyGraph);
 }
 
-module.exports.blindSignRequest = (secret, nonce) => {
+module.exports.blindSignRequest = (secret, challenge) => {
   requireWasmInitialized();
 
-  return wasm.blindSignRequest(secret, nonce);
+  return wasm.blindSignRequest(secret, challenge);
 }
 
-module.exports.blindSign = (commitment, pokForCommitment, nonce, document, proof, keyGraph) => {
+module.exports.verifyBlindSignRequest = (commitment, pok_for_commitment, challenge) => {
   requireWasmInitialized();
 
-  return wasm.blindSign(commitment, pokForCommitment, nonce, document, proof, keyGraph);
+  return wasm.verifyBlindSignRequest(commitment, pok_for_commitment, challenge);
+}
+
+module.exports.blindSign = (commitment, document, proofOptions, keyGraph) => {
+  requireWasmInitialized();
+
+  return wasm.blindSign(commitment, document, proofOptions, keyGraph);
 }
 
 module.exports.unblind = (document, proof, blinding) => {
@@ -76,8 +82,8 @@ module.exports.deriveProof = (request) => {
   return wasm.deriveProof(request);
 }
 
-module.exports.verifyProof = (vp, nonce, keyGraph) => {
+module.exports.verifyProof = (vp, keyGraph, challenge, domain) => {
   requireWasmInitialized();
 
-  return wasm.verifyProof(vp, nonce, keyGraph);
+  return wasm.verifyProof(vp, keyGraph, challenge, domain);
 }
