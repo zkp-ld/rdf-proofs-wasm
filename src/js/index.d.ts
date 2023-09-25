@@ -43,11 +43,18 @@ export interface DeriveProofVcPair {
 }
 
 export interface DeriveProofRequest {
-  readonly secret?: Uint8Array;
   readonly vcPairs: DeriveProofVcPair[];
   readonly deanonMap: Map<string, string>;
-  readonly nonce: string;
   readonly keyGraph: string;
+  readonly challenge?: string;
+  readonly domain?: string;
+  readonly secret?: Uint8Array;
+  readonly commitSecret?: bool;
+}
+
+export interface DerivedProof {
+  readonly vp: string;
+  readonly blinding?: string;
 }
 
 /**
@@ -77,29 +84,37 @@ export function verify(
 
 /**
  * @param {Uint8Array} secret
- * @param {string} nonce
+ * @param {string?} challenge
  * @returns {BlindSignRequest}
  */
 export function blindSignRequest(
   secret: Uint8Array,
-  nonce: string,
+  challenge?: string,
 ): BlindSignRequest;
 
 /**
  * @param {string} commitment
- * @param {string} pokForCommitment
- * @param {string} nonce
+ * @param {string} pok_for_commitment
+ * @param {string?} challenge
+ * @returns {VerifyResult}
+ */
+export function verifyBlindSignRequest(
+  commitment: string,
+  pok_for_commitment: string,
+  challenge?: string,
+): VerifyResult;
+
+/**
+ * @param {string} commitment
  * @param {string} document
- * @param {string} proof
+ * @param {string} proofOptions
  * @param {string} keyGraph
  * @returns {string}
  */
 export function blindSign(
   commitment: string,
-  pokForCommitment: string,
-  nonce: string,
   document: string,
-  proof: string,
+  proofOptions: string,
   keyGraph: string,
 ): string;
 
@@ -131,18 +146,20 @@ export function blindVerify(
 
 /**
  * @param {DeriveProofRequest} request
- * @returns {string}
+ * @returns {DerivedProof}
  */
-export function deriveProof(request: DeriveProofRequest): string;
+export function deriveProof(request: DeriveProofRequest): DerivedProof;
 
 /**
  * @param {string} vp
- * @param {string} nonce
  * @param {string} keyGraph
+ * @param {string?} challenge
+ * @param {string?} domain
  * @returns {VerifyResult}
  */
 export function verifyProof(
   vp: string,
-  nonce: string,
   keyGraph: string,
+  challenge?: string,
+  domain?: string,
 ): VerifyResult;

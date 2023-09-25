@@ -6,7 +6,7 @@ use error::RDFProofsWasmError;
 use rdf_proofs::{
     ark_to_base64url, blind_sign_request_string, blind_sign_string, blind_verify_string,
     derive_proof_string, key_gen::generate_keypair, sign_string, unblind_string,
-    verify_proof_string, verify_string, VcPairString,
+    verify_blind_sig_request_string, verify_proof_string, verify_string, VcPairString,
 };
 use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult};
 use wasm_bindgen::prelude::*;
@@ -52,37 +52,56 @@ pub fn verify_caller(document: &str, proof: &str, key_graph: &str) -> Result<JsV
 }
 
 #[wasm_bindgen(js_name = blindSignRequest)]
-pub fn blind_sign_request_caller(secret: &[u8], nonce: &str) -> Result<JsValue, JsValue> {
+pub fn blind_sign_request_caller(
+    secret: &[u8],
+    challenge: Option<String>,
+) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
-    let req_and_blinding = blind_sign_request_string(&mut rng, secret, Some(nonce))
+    let req_and_blinding = blind_sign_request_string(&mut rng, secret, challenge.as_deref())
         .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&req_and_blinding)?)
+}
+
+#[wasm_bindgen(js_name = verifyBlindSignRequest)]
+pub fn verify_blind_sign_request_caller(
+    commitment: &str,
+    pok_for_commitment: &str,
+    challenge: Option<String>,
+) -> Result<JsValue, JsValue> {
+    set_panic_hook();
+
+    let mut rng = get_seeded_rng();
+    match verify_blind_sig_request_string(
+        &mut rng,
+        commitment,
+        pok_for_commitment,
+        challenge.as_deref(),
+    ) {
+        Ok(()) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
+            verified: true,
+            error: None,
+        })?),
+        Err(e) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
+            verified: false,
+            error: Some(format!("{:?}", e)),
+        })?),
+    }
 }
 
 #[wasm_bindgen(js_name = blindSign)]
 pub fn blind_sign_caller(
     commitment: &str,
-    pok_for_commitment: &str,
-    nonce: &str,
     document: &str,
-    proof: &str,
+    proof_options: &str,
     key_graph: &str,
 ) -> Result<String, JsValue> {
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
-    let proof_value = blind_sign_string(
-        &mut rng,
-        commitment,
-        pok_for_commitment,
-        Some(nonce),
-        document,
-        proof,
-        key_graph,
-    )
-    .map_err(RDFProofsWasmError::from)?;
+    let proof_value = blind_sign_string(&mut rng, commitment, document, proof_options, key_graph)
+        .map_err(RDFProofsWasmError::from)?;
     Ok(proof_value)
 }
 
@@ -117,7 +136,7 @@ pub fn blind_verify_caller(
 }
 
 #[wasm_bindgen(js_name = deriveProof)]
-pub fn derive_proof_caller(request: JsValue) -> Result<String, JsValue> {
+pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
     let request: DeriveProofRequest = serde_wasm_bindgen::from_value(request)?;
@@ -135,28 +154,38 @@ pub fn derive_proof_caller(request: JsValue) -> Result<String, JsValue> {
         })
         .collect();
 
-    // convert `Option<Vec<u8>>` to `Option<&[u8]>`
-    let secret = request.secret.as_ref().map(AsRef::as_ref);
-
     let vp = derive_proof_string(
         &mut rng,
-        secret,
         &vc_pairs,
         &request.deanon_map,
-        Some(&request.nonce),
         &request.key_graph,
+        request.challenge.as_deref(),
+        request.domain.as_deref(),
+        request.secret.as_deref(),
+        request.commit_secret,
     )
     .map_err(RDFProofsWasmError::from)?;
-    Ok(vp)
+    Ok(serde_wasm_bindgen::to_value(&vp)?)
 }
 
 #[wasm_bindgen(js_name = verifyProof)]
-pub fn verify_proof_caller(vp: &str, nonce: &str, key_graph: &str) -> Result<JsValue, JsValue> {
+pub fn verify_proof_caller(
+    vp: &str,
+    key_graph: &str,
+    challenge: Option<String>,
+    domain: Option<String>,
+) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
 
-    match verify_proof_string(&mut rng, vp, Some(nonce), key_graph) {
+    match verify_proof_string(
+        &mut rng,
+        vp,
+        key_graph,
+        challenge.as_deref(),
+        domain.as_deref(),
+    ) {
         Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,
             error: None,
