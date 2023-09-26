@@ -46,16 +46,16 @@ module.exports.verify = (document, proof, keyGraph) => {
   return wasm.verify(document, proof, keyGraph);
 }
 
-module.exports.blindSignRequest = (secret, challenge) => {
+module.exports.requestBlindSign = (secret, challenge, skipPok) => {
   requireWasmInitialized();
 
-  return wasm.blindSignRequest(secret, challenge);
+  return wasm.requestBlindSign(secret, challenge, skipPok);
 }
 
-module.exports.verifyBlindSignRequest = (commitment, pok_for_commitment, challenge) => {
+module.exports.verifyBlindSignRequest = (commitment, pokForCommitment, challenge) => {
   requireWasmInitialized();
 
-  return wasm.verifyBlindSignRequest(commitment, pok_for_commitment, challenge);
+  return wasm.verifyBlindSignRequest(commitment, pokForCommitment, challenge);
 }
 
 module.exports.blindSign = (commitment, document, proofOptions, keyGraph) => {

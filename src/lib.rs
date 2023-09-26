@@ -4,9 +4,9 @@ mod utils;
 use crate::utils::get_seeded_rng;
 use error::RDFProofsWasmError;
 use rdf_proofs::{
-    ark_to_base64url, blind_sign_request_string, blind_sign_string, blind_verify_string,
-    derive_proof_string, key_gen::generate_keypair, sign_string, unblind_string,
-    verify_blind_sig_request_string, verify_proof_string, verify_string, VcPairString,
+    ark_to_base64url, blind_sign_string, blind_verify_string, derive_proof_string,
+    key_gen::generate_keypair, request_blind_sign_string, sign_string, unblind_string,
+    verify_blind_sign_request_string, verify_proof_string, verify_string, VcPairString,
 };
 use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult};
 use wasm_bindgen::prelude::*;
@@ -51,16 +51,18 @@ pub fn verify_caller(document: &str, proof: &str, key_graph: &str) -> Result<JsV
     }
 }
 
-#[wasm_bindgen(js_name = blindSignRequest)]
-pub fn blind_sign_request_caller(
+#[wasm_bindgen(js_name = requestBlindSign)]
+pub fn request_blind_sign_caller(
     secret: &[u8],
     challenge: Option<String>,
+    skip_pok: Option<bool>,
 ) -> Result<JsValue, JsValue> {
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
-    let req_and_blinding = blind_sign_request_string(&mut rng, secret, challenge.as_deref())
-        .map_err(RDFProofsWasmError::from)?;
+    let req_and_blinding =
+        request_blind_sign_string(&mut rng, secret, challenge.as_deref(), skip_pok)
+            .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&req_and_blinding)?)
 }
 
@@ -73,7 +75,7 @@ pub fn verify_blind_sign_request_caller(
     set_panic_hook();
 
     let mut rng = get_seeded_rng();
-    match verify_blind_sig_request_string(
+    match verify_blind_sign_request_string(
         &mut rng,
         commitment,
         pok_for_commitment,
@@ -162,7 +164,7 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
         request.challenge.as_deref(),
         request.domain.as_deref(),
         request.secret.as_deref(),
-        request.commit_secret,
+        request.blind_sign_request,
     )
     .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&vp)?)

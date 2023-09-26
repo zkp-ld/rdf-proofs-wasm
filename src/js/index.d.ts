@@ -31,8 +31,8 @@ export interface VerifyResult {
 
 export interface BlindSignRequest {
   readonly commitment: string;
-  readonly pokForCommitment: string;
   readonly blinding: string;
+  readonly pokForCommitment?: string;
 }
 
 export interface DeriveProofVcPair {
@@ -49,7 +49,7 @@ export interface DeriveProofRequest {
   readonly challenge?: string;
   readonly domain?: string;
   readonly secret?: Uint8Array;
-  readonly commitSecret?: bool;
+  readonly blindSignRequest?: BlindSignRequest;
 }
 
 export interface DerivedProof {
@@ -87,20 +87,21 @@ export function verify(
  * @param {string?} challenge
  * @returns {BlindSignRequest}
  */
-export function blindSignRequest(
+export function requestBlindSign(
   secret: Uint8Array,
   challenge?: string,
+  skipPok?: boolean,
 ): BlindSignRequest;
 
 /**
  * @param {string} commitment
- * @param {string} pok_for_commitment
+ * @param {string} pokForCommitment
  * @param {string?} challenge
  * @returns {VerifyResult}
  */
 export function verifyBlindSignRequest(
   commitment: string,
-  pok_for_commitment: string,
+  pokForCommitment: string,
   challenge?: string,
 ): VerifyResult;
 
@@ -146,9 +147,9 @@ export function blindVerify(
 
 /**
  * @param {DeriveProofRequest} request
- * @returns {DerivedProof}
+ * @returns {string}
  */
-export function deriveProof(request: DeriveProofRequest): DerivedProof;
+export function deriveProof(request: DeriveProofRequest): string;
 
 /**
  * @param {string} vp

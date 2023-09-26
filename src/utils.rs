@@ -1,4 +1,5 @@
 use ark_std::rand::{prelude::StdRng, SeedableRng};
+use rdf_proofs::BlindSignRequestString;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -40,8 +41,8 @@ pub struct DeriveProofRequest {
     pub challenge: Option<String>,
     pub domain: Option<String>,
     pub secret: Option<Vec<u8>>,
-    #[serde(rename = "commitSecret")]
-    pub commit_secret: Option<bool>,
+    #[serde(rename = "blindSignRequest")]
+    pub blind_sign_request: Option<BlindSignRequestString>,
 }
 
 #[derive(Serialize, Deserialize)]
