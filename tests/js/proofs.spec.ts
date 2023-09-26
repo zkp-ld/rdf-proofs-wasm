@@ -148,7 +148,7 @@ describe('Proofs', () => {
       keyGraph,
       challenge,
     };
-    const { vp } = deriveProof(req);
+    const vp = deriveProof(req);
     console.log(`vp: ${vp}`);
 
     expect(vp).toBeTruthy();
@@ -218,7 +218,7 @@ describe('Proofs', () => {
       keyGraph,
       challenge,
     };
-    const { vp } = deriveProof(req);
+    const vp = deriveProof(req);
     console.log(`vp: ${vp}`);
 
     expect(vp).toBeTruthy();
