@@ -240,4 +240,52 @@ describe('Blind Signatures', () => {
     const verified = verifyProof(vp, keyGraph, challenge, domain);
     expect(verified.verified).toBeTruthy();
   });
+
+  test('deriveProof with blind sign reqeust and PPID', async () => {
+    await initializeWasm();
+
+    const deanonMap = new Map([
+      ['_:e0', '<did:example:john>'],
+      ['_:e1', '<http://example.org/vaccine/a>'],
+      ['_:e2', '<http://example.org/vcred/00>'],
+      ['_:e3', '<http://example.org/vicred/a>'],
+    ]);
+    const secret = new Uint8Array(Buffer.from('SECRET'));
+    const blindSignRequest = requestBlindSign(secret, undefined, true);
+    expect(blindSignRequest.pokForCommitment).toBeUndefined();
+
+    const vcPair1: DeriveProofVcPair = {
+      originalDocument: doc1,
+      originalProof: boundProof1,
+      disclosedDocument: disclosedDoc1,
+      disclosedProof: disclosedBoundProof1,
+    };
+    const vcPair2: DeriveProofVcPair = {
+      originalDocument: doc2,
+      originalProof: proof2,
+      disclosedDocument: disclosedDoc2,
+      disclosedProof: disclosedProof2,
+    };
+
+    const challenge = 'abcde';
+    const domain = 'example.org';
+
+    const req: DeriveProofRequest = {
+      vcPairs: [vcPair1, vcPair2],
+      deanonMap,
+      keyGraph,
+      challenge,
+      domain,
+      secret,
+      blindSignRequest,
+      withPpid: true,
+    };
+    const vp = deriveProof(req);
+    console.log(`vp: ${vp}`);
+
+    expect(vp).toBeTruthy();
+
+    const verified = verifyProof(vp, keyGraph, challenge, domain);
+    expect(verified.verified).toBeTruthy();
+  });
 });

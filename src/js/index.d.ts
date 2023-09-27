@@ -50,6 +50,7 @@ export interface DeriveProofRequest {
   readonly domain?: string;
   readonly secret?: Uint8Array;
   readonly blindSignRequest?: BlindSignRequest;
+  readonly withPpid?: boolean;
 }
 
 export interface DerivedProof {
