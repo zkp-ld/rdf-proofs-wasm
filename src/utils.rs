@@ -43,6 +43,8 @@ pub struct DeriveProofRequest {
     pub secret: Option<Vec<u8>>,
     #[serde(rename = "blindSignRequest")]
     pub blind_sign_request: Option<BlindSignRequestString>,
+    #[serde(rename = "withPpid")]
+    pub with_ppid: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize)]

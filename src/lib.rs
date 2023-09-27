@@ -165,6 +165,7 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
         request.domain.as_deref(),
         request.secret.as_deref(),
         request.blind_sign_request,
+        request.with_ppid,
     )
     .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&vp)?)
