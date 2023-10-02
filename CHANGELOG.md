@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1] - 2023-10-02
+
+### Changed
+
+- Reflect the latest updates in `rdf-proofs`
+    - change `proofPurpose` of VP from `assertionMethod` to `authentication` to align with the spec
+
 ## [0.12.0] - 2023-09-28
 
 ### Added
