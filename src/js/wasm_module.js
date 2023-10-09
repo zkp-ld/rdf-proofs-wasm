@@ -82,8 +82,8 @@ module.exports.deriveProof = (request) => {
   return wasm.deriveProof(request);
 }
 
-module.exports.verifyProof = (vp, keyGraph, challenge, domain) => {
+module.exports.verifyProof = (request) => {
   requireWasmInitialized();
 
-  return wasm.verifyProof(vp, keyGraph, challenge, domain);
+  return wasm.verifyProof(request);
 }

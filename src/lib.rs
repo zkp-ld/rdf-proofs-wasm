@@ -6,9 +6,10 @@ use error::RDFProofsWasmError;
 use rdf_proofs::{
     ark_to_base64url, blind_sign_string, blind_verify_string, derive_proof_string,
     key_gen::generate_keypair, request_blind_sign_string, sign_string, unblind_string,
-    verify_blind_sign_request_string, verify_proof_string, verify_string, VcPairString,
+    verify_blind_sign_request_string, verify_proof_string, verify_string,
+    PredicateProofStatementString, VcPairString,
 };
-use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyResult};
+use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyProofRequest, VerifyResult};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_name = keyGen)]
@@ -155,6 +156,22 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
             )
         })
         .collect();
+    let predicates = match request.predicates {
+        Some(predicates) => Some(
+            predicates
+                .into_iter()
+                .map(|predicate| PredicateProofStatementString {
+                    circuit_id: predicate.circuit_id,
+                    circuit_r1cs: predicate.circuit_r1cs,
+                    circuit_wasm: predicate.circuit_wasm,
+                    snark_proving_key: predicate.snark_proving_key,
+                    private: predicate.private,
+                    public: predicate.public,
+                })
+                .collect::<Vec<_>>(),
+        ),
+        None => None,
+    };
 
     let vp = derive_proof_string(
         &mut rng,
@@ -166,28 +183,27 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
         request.secret.as_deref(),
         request.blind_sign_request,
         request.with_ppid,
+        predicates.as_ref(),
     )
     .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&vp)?)
 }
 
 #[wasm_bindgen(js_name = verifyProof)]
-pub fn verify_proof_caller(
-    vp: &str,
-    key_graph: &str,
-    challenge: Option<String>,
-    domain: Option<String>,
-) -> Result<JsValue, JsValue> {
+pub fn verify_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
     set_panic_hook();
+
+    let request: VerifyProofRequest = serde_wasm_bindgen::from_value(request)?;
 
     let mut rng = get_seeded_rng();
 
     match verify_proof_string(
         &mut rng,
-        vp,
-        key_graph,
-        challenge.as_deref(),
-        domain.as_deref(),
+        &request.vp,
+        &request.key_graph,
+        request.challenge.as_deref(),
+        request.domain.as_deref(),
+        request.snark_verifying_keys,
     ) {
         Ok(_) => Ok(serde_wasm_bindgen::to_value(&VerifyResult {
             verified: true,

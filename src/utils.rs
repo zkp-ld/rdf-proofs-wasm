@@ -31,6 +31,20 @@ pub struct DeriveProofVcPair {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct DeriveProofPredicate {
+    #[serde(rename = "circuitId")]
+    pub circuit_id: String,
+    #[serde(rename = "circuitR1CS")]
+    pub circuit_r1cs: String,
+    #[serde(rename = "circuitWasm")]
+    pub circuit_wasm: Vec<u8>,
+    #[serde(rename = "snarkProvingKey")]
+    pub snark_proving_key: String,
+    pub private: Vec<(String, String)>,
+    pub public: Vec<(String, String)>,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct DeriveProofRequest {
     #[serde(rename = "vcPairs")]
     pub vc_pairs: Vec<DeriveProofVcPair>,
@@ -45,14 +59,18 @@ pub struct DeriveProofRequest {
     pub blind_sign_request: Option<BlindSignRequestString>,
     #[serde(rename = "withPpid")]
     pub with_ppid: Option<bool>,
+    pub predicates: Option<Vec<DeriveProofPredicate>>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct VerifyProofRequest {
-    pub vc_pairs: Vec<(String, String, String, String)>,
-    pub deanon_map: HashMap<String, String>,
-    pub challenge: String,
-    pub document_loader: String,
+    pub vp: String,
+    #[serde(rename = "keyGraph")]
+    pub key_graph: String,
+    pub challenge: Option<String>,
+    pub domain: Option<String>,
+    #[serde(rename = "snarkVerifyingKeys")]
+    pub snark_verifying_keys: Option<HashMap<String, String>>,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

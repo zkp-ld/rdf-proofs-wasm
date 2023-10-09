@@ -42,6 +42,15 @@ export interface DeriveProofVcPair {
   readonly disclosedProof: string;
 }
 
+export interface DeriveProofPredicate {
+  readonly circuitId: string;
+  readonly circuitR1CS: string;
+  readonly circuitWasm: Uint8Array;
+  readonly snarkProvingKey: string;
+  readonly private: [string, string][];
+  readonly public: [string, string][];
+}
+
 export interface DeriveProofRequest {
   readonly vcPairs: DeriveProofVcPair[];
   readonly deanonMap: Map<string, string>;
@@ -51,11 +60,20 @@ export interface DeriveProofRequest {
   readonly secret?: Uint8Array;
   readonly blindSignRequest?: BlindSignRequest;
   readonly withPpid?: boolean;
+  readonly predicates?: DeriveProofPredicate[];
 }
 
 export interface DerivedProof {
   readonly vp: string;
   readonly blinding?: string;
+}
+
+export interface VerifyProofRequest {
+  readonly vp: string;
+  readonly keyGraph: string;
+  readonly challenge?: string;
+  readonly domain?: string;
+  readonly snarkVerifyingKeys?: Map<string, string>;
 }
 
 /**
@@ -153,15 +171,7 @@ export function blindVerify(
 export function deriveProof(request: DeriveProofRequest): string;
 
 /**
- * @param {string} vp
- * @param {string} keyGraph
- * @param {string?} challenge
- * @param {string?} domain
+ * @param {VerifyProofRequest} request
  * @returns {VerifyResult}
  */
-export function verifyProof(
-  vp: string,
-  keyGraph: string,
-  challenge?: string,
-  domain?: string,
-): VerifyResult;
+export function verifyProof(request: VerifyProofRequest): VerifyResult;
