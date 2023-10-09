@@ -51,7 +51,7 @@ _:b0 <https://w3id.org/security#proofPurpose> <https://w3id.org/security#asserti
 _:b0 <https://w3id.org/security#verificationMethod> <did:example:issuer0#bls12_381-g2-pub001> .
 `;
 const boundProof1 = `
-_:b0 <https://w3id.org/security#proofValue> "usYxFJJw9C0KHipWTTevDyU44iLEd6OWcqd1k33w0iuectnnNpDGS5D_kTULrexnpAWQCF5cBR1F0h3FXGsm2xh7Fafg49VG-Slte0XnTgDzpRqn0nqhO4I57s-b3TPVbA_t5uyJnGllyB6QcwVtRQA"^^<https://w3id.org/security#multibase> .
+_:b0 <https://w3id.org/security#proofValue> "utXwiR3cqE_vytaKRk1jO5bijPewZ8Vx67WqHBjJ1TAN8BoEnhdu7zXyZ1WTYuLHqAWQCF5cBR1F0h3FXGsm2xh7Fafg49VG-Slte0XnTgDzpRqn0nqhO4I57s-b3TPVbA_t5uyJnGllyB6QcwVtRQA"^^<https://w3id.org/security#multibase> .
 _:b0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .
 _:b0 <https://w3id.org/security#cryptosuite> "bbs-termwise-bound-signature-2023" .
 _:b0 <http://purl.org/dc/terms/created> "2023-02-09T09:35:07Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
@@ -70,7 +70,7 @@ const doc2 = `
 <http://example.org/vicred/a> <https://www.w3.org/2018/credentials#expirationDate> "2023-12-31T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
 `;
 const proof2 = `
-_:b0 <https://w3id.org/security#proofValue> "uh-n1eUTNbs6fG9NMTPTL98zwcwfA1N4GCm0XXl__t5tMKOKU1LBfwt1f7Dtoy9dHnHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
+_:b0 <https://w3id.org/security#proofValue> "uoB9zdaILAqel15HTh6MtIkDZjoeQn2g-fqACEgZvKNMRbgGqTOmNDclM2Pv-WF7BnHL4DdyqBDvkUBbr0eTTUk3vNVI1LRxSfXRqqLng4Qx6SX7tptjtHzjJMkQnolGpiiFfE9k8OhOKcntcJwGSaQ"^^<https://w3id.org/security#multibase> .
 _:b0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/security#DataIntegrityProof> .
 _:b0 <https://w3id.org/security#cryptosuite> "bbs-termwise-signature-2023" .
 _:b0 <http://purl.org/dc/terms/created> "2023-02-03T09:49:25Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
@@ -190,7 +190,7 @@ describe('Blind Signatures', () => {
 
     expect(vp).toBeTruthy();
 
-    const verified = verifyProof(vp, keyGraph, challenge);
+    const verified = verifyProof({ vp, keyGraph, challenge });
     expect(verified.verified).toBeTruthy();
   });
 
@@ -237,7 +237,7 @@ describe('Blind Signatures', () => {
 
     expect(vp).toBeTruthy();
 
-    const verified = verifyProof(vp, keyGraph, challenge, domain);
+    const verified = verifyProof({ vp, keyGraph, challenge, domain });
     expect(verified.verified).toBeTruthy();
   });
 
@@ -285,7 +285,7 @@ describe('Blind Signatures', () => {
 
     expect(vp).toBeTruthy();
 
-    const verified = verifyProof(vp, keyGraph, challenge, domain);
+    const verified = verifyProof({ vp, keyGraph, challenge, domain });
     expect(verified.verified).toBeTruthy();
   });
 });
