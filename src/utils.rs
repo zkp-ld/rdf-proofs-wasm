@@ -37,7 +37,7 @@ pub struct DeriveProofPredicate {
     #[serde(rename = "circuitR1CS")]
     pub circuit_r1cs: String,
     #[serde(rename = "circuitWasm")]
-    pub circuit_wasm: Vec<u8>,
+    pub circuit_wasm: String,
     #[serde(rename = "snarkProvingKey")]
     pub snark_proving_key: String,
     pub private: Vec<(String, String)>,

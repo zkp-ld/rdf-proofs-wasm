@@ -45,7 +45,7 @@ export interface DeriveProofVcPair {
 export interface DeriveProofPredicate {
   readonly circuitId: string;
   readonly circuitR1CS: string;
-  readonly circuitWasm: Uint8Array;
+  readonly circuitWasm: string;
   readonly snarkProvingKey: string;
   readonly private: [string, string][];
   readonly public: [string, string][];
