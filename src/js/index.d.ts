@@ -42,13 +42,10 @@ export interface DeriveProofVcPair {
   readonly disclosedProof: string;
 }
 
-export interface DeriveProofPredicate {
-  readonly circuitId: string;
-  readonly circuitR1CS: string;
-  readonly circuitWasm: string;
-  readonly snarkProvingKey: string;
-  readonly private: [string, string][];
-  readonly public: [string, string][];
+export interface CircuitString {
+  readonly r1cs: string;
+  readonly wasm: string;
+  readonly provingKey: string;
 }
 
 export interface DeriveProofRequest {
@@ -60,7 +57,8 @@ export interface DeriveProofRequest {
   readonly secret?: Uint8Array;
   readonly blindSignRequest?: BlindSignRequest;
   readonly withPpid?: boolean;
-  readonly predicates?: DeriveProofPredicate[];
+  readonly predicates?: string[];
+  readonly circuits?: Map<string, CircuitString>;
 }
 
 export interface DerivedProof {
