@@ -6,8 +6,7 @@ use error::RDFProofsWasmError;
 use rdf_proofs::{
     ark_to_base64url, blind_sign_string, blind_verify_string, derive_proof_string,
     key_gen::generate_keypair, request_blind_sign_string, sign_string, unblind_string,
-    verify_blind_sign_request_string, verify_proof_string, verify_string,
-    PredicateProofStatementString, VcPairString,
+    verify_blind_sign_request_string, verify_proof_string, verify_string, VcPairString,
 };
 use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyProofRequest, VerifyResult};
 use wasm_bindgen::prelude::*;
@@ -156,22 +155,6 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
             )
         })
         .collect();
-    let predicates = match request.predicates {
-        Some(predicates) => Some(
-            predicates
-                .into_iter()
-                .map(|predicate| PredicateProofStatementString {
-                    circuit_id: predicate.circuit_id,
-                    circuit_r1cs: predicate.circuit_r1cs,
-                    circuit_wasm: predicate.circuit_wasm,
-                    snark_proving_key: predicate.snark_proving_key,
-                    private: predicate.private,
-                    public: predicate.public,
-                })
-                .collect::<Vec<_>>(),
-        ),
-        None => None,
-    };
 
     let vp = derive_proof_string(
         &mut rng,
@@ -183,7 +166,8 @@ pub fn derive_proof_caller(request: JsValue) -> Result<JsValue, JsValue> {
         request.secret.as_deref(),
         request.blind_sign_request,
         request.with_ppid,
-        predicates.as_ref(),
+        request.predicates.as_ref(),
+        request.circuits.as_ref(),
     )
     .map_err(RDFProofsWasmError::from)?;
     Ok(serde_wasm_bindgen::to_value(&vp)?)

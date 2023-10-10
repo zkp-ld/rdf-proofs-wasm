@@ -1,5 +1,5 @@
 use ark_std::rand::{prelude::StdRng, SeedableRng};
-use rdf_proofs::BlindSignRequestString;
+use rdf_proofs::{BlindSignRequestString, CircuitString};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -59,7 +59,8 @@ pub struct DeriveProofRequest {
     pub blind_sign_request: Option<BlindSignRequestString>,
     #[serde(rename = "withPpid")]
     pub with_ppid: Option<bool>,
-    pub predicates: Option<Vec<DeriveProofPredicate>>,
+    pub predicates: Option<Vec<String>>,
+    pub circuits: Option<HashMap<String, CircuitString>>,
 }
 
 #[derive(Serialize, Deserialize)]
