@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.1] - 2024-01-11
+
+### Changed
+
+- [Rust] Upgraded `rdf-proofs` crate from GitHub sources to pre-release versions on crates.io
+
 ## [0.13.0] - 2023-10-18
 
 ### Added
