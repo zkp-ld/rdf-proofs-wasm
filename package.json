@@ -2,7 +2,7 @@
   "name": "@zkp-ld/rdf-proofs-wasm",
   "author": "yamdan",
   "description": "WASM binding for rdf-proofs",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,10 +27,11 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
+    "@types/node": "^20.11.0",
     "jest": "^29.6.2",
     "prettier": "^3.0.2",
-    "rollup": "^3.28.0",
+    "rollup": "^4.9.4",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.1.6"    
+    "typescript": "^5.1.6"
   }
 }
