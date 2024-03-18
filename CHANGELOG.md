@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.2] - 2024-03-18
+
+### Changed
+
+- [Rust] Upgraded `rdf-proofs` crate
+
 ## [0.13.1] - 2024-01-11
 
 ### Added
