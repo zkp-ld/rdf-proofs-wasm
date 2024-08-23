@@ -4,7 +4,7 @@
 
 ### Changed
 
-- [Rust] Upgrade `rdf-proofs` and other crates
+- **BREAKING**: [Rust] Upgraded `rdf-proofs` crate, leading to significant changes in the encoding of keys and proofs
 - [Rust] Pin `wasm-bindgen` dependency to version 0.2.92: The latest version 0.2.93 causes errors during `npm test`
 - Update test vectors to align with the latest `rdf-proofs`
 - Update npm dependencies
