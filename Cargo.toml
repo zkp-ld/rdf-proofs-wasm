@@ -13,7 +13,7 @@ description = "WASM binding for rdf-proofs"
 crate-type = ["cdylib"]
 
 [dependencies]
-console_error_panic_hook = { version = "0.1.1", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
 rand = "0.8"
 getrandom = { version = "0.2", features = ["js"] }
 ark-std = { version = "0.4", default-features = false }
