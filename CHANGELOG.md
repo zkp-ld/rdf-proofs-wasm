@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.14.0] - 2024-08-23
+
+### Changed
+
+- [Rust] Upgrade `rdf-proofs` and other crates
+- [Rust] Pin `wasm-bindgen` dependency to version 0.2.92: The latest version 0.2.93 causes errors during `npm test`
+- Update test vectors to align with the latest `rdf-proofs`
+- Update npm dependencies
+
 ## [0.13.3] - 2024-03-18
 
 ### Changed
