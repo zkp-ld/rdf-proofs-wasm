@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.1] - 2024-08-24
+
+### Changed
+
+- Modified `keyGen` function to generate base58btc-encoded key pairs
+- [Rust] Upgraded `rdf-proofs` crate
+- Updated npm dependencies
+
 ## [0.14.0] - 2024-08-23
 
 ### Changed
