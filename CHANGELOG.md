@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.2] - 2024-09-25
+
+### Changed
+
+- [Rust] Upgraded `rdf-proofs` crate
+- Updated npm dependencies
+
 ## [0.14.1] - 2024-08-24
 
 ### Changed
