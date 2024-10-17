@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.15.0] - 2024-10-17
+
+### Added
+
+- `ppidGen` API for generating PPID from a user secret and domain identifier
+
 ## [0.14.2] - 2024-09-25
 
 ### Changed
