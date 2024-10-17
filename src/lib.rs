@@ -4,9 +4,9 @@ mod utils;
 use crate::utils::get_seeded_rng;
 use error::RDFProofsWasmError;
 use rdf_proofs::{
-    blind_sign_string, blind_verify_string, derive_proof_string, request_blind_sign_string,
-    sign_string, unblind_string, verify_blind_sign_request_string, verify_proof_string,
-    verify_string, KeyPairBase58Btc, VcPairString,
+    blind_sign_string, blind_verify_string, derive_proof_string, key_gen::PPID,
+    request_blind_sign_string, sign_string, unblind_string, verify_blind_sign_request_string,
+    verify_proof_string, verify_string, KeyPairBase58Btc, VcPairString,
 };
 use utils::{set_panic_hook, DeriveProofRequest, KeyPair, VerifyProofRequest, VerifyResult};
 use wasm_bindgen::prelude::*;
@@ -25,6 +25,16 @@ pub fn key_gen_caller() -> Result<JsValue, JsValue> {
         secret_key,
         public_key,
     })?)
+}
+
+#[wasm_bindgen(js_name = ppidGen)]
+pub fn ppid_gen_caller(secret: &[u8], domain: &str) -> Result<String, JsValue> {
+    set_panic_hook();
+
+    let ppid = PPID::new(secret, domain).map_err(RDFProofsWasmError::from)?;
+    let did = ppid.try_into_did_key().map_err(RDFProofsWasmError::from)?;
+
+    Ok(did)
 }
 
 #[wasm_bindgen(js_name = sign)]
