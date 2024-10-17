@@ -34,6 +34,12 @@ module.exports.keyGen = () => {
   return wasm.keyGen();
 }
 
+module.exports.ppidGen = (secret, domain) => {
+  requireWasmInitialized();
+
+  return wasm.ppidGen(secret, domain);
+}
+
 module.exports.sign = (document, proof, keyGraph) => {
   requireWasmInitialized();
 

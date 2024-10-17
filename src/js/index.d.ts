@@ -80,6 +80,13 @@ export interface VerifyProofRequest {
 export function keyGen(): KeyPair;
 
 /**
+ * @param {Uint8Array} secret
+ * @param {string} domain
+ * @returns {string}
+ */
+export function ppidGen(secret: Uint8Array, domain: string): string;
+
+/**
  * @param {string} document
  * @param {string} proof
  * @param {string} keyGraph
